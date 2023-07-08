@@ -3,7 +3,6 @@ package com.alash.eventease.controller;
 import com.alash.eventease.dto.*;
 import com.alash.eventease.service.EventService;
 import com.alash.eventease.service.UserService;
-import com.alash.eventease.service.UserServiceImpl;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +27,6 @@ public class UserController {
 
     @PostMapping("/signin")
     public ResponseEntity<CustomResponse> signin(@RequestBody LoginDto request) {
-//        return userService.signIn(request);
         return userService.signIn(request);
     }
 

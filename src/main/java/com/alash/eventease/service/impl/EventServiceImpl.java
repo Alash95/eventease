@@ -1,4 +1,4 @@
-package com.alash.eventease.service;
+package com.alash.eventease.service.impl;
 
 import com.alash.eventease.dto.CreateEventRequest;
 import com.alash.eventease.dto.CustomResponse;
@@ -6,6 +6,7 @@ import com.alash.eventease.model.Event;
 import com.alash.eventease.model.UserEntity;
 import com.alash.eventease.repository.EventRepository;
 import com.alash.eventease.repository.UserRepository;
+import com.alash.eventease.service.EventService;
 import com.alash.eventease.utils.ResponseUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,11 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
-//@RequiredArgsConstructor
-public class EventServiceImpl implements EventService{
+@RequiredArgsConstructor
+public class EventServiceImpl implements EventService {
 
-    private  EventRepository eventRepository;
-    private UserRepository userRepository;
+    private final EventRepository eventRepository;
+    private final UserRepository userRepository;
 
 
     @Override

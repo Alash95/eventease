@@ -1,15 +1,13 @@
-package com.alash.eventease.service;
+package com.alash.eventease.service.impl;
 
 import com.alash.eventease.dto.*;
 import com.alash.eventease.model.UserEntity;
 import com.alash.eventease.model.UserRole;
 import com.alash.eventease.repository.UserRepository;
 import com.alash.eventease.repository.UserRoleRepository;
-import com.alash.eventease.security.JwtTokenProvider;
+import com.alash.eventease.service.UserService;
 import com.alash.eventease.utils.ResponseUtils;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,13 +24,12 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final JwtTokenProvider jwtTokenProvider;
 
     private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]+$";
     private static final Pattern pattern = Pattern.compile(EMAIL_REGEX);
