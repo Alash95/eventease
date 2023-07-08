@@ -1,4 +1,4 @@
-package com.alash.eventease.dto.response;
+package com.alash.eventease.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
-
-import java.util.List;
 
 @Builder
 @Data

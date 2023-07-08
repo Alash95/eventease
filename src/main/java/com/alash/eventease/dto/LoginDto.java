@@ -1,18 +1,15 @@
-package com.alash.eventease.dto.request;
+package com.alash.eventease.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-public class RegisterUserRequest {
+@Builder
+public class LoginDto {
     private String email;
-    private String firstName;
-    private String lastName;
-    private String phoneNumber;
     private String password;
 }

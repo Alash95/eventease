@@ -1,5 +1,7 @@
 package com.alash.eventease.security;
 
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,57 +20,63 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 @EnableWebSecurity
+@AllArgsConstructor
 public class WebSecurityConfig {
 
-    private UserDetailsService userDetailsService;
-
-    private static final String[] ADMIN_SECURED_URL = {
-            "/api/v1/admin/create-role",
-            "/api/v1/admin/**"
-    };
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final UserDetailsService userDetailsService;
 
     private static final String[] UN_SECURED_URL = {
             "/api/v1/user/**",
-            "/api/v1/admin/adminsignup/**",
-            "/api/v1/admin/user-role/**",
-
-//            "/v2/api-docs",
-//            "/v3/api-docs/**",
-//            "/swagger-resources",
-//            "/swagger-resources/**",
-//            "/configuration/ui",
-//            "/configuration/security",
-//            "/swagger-ui/**",
-//            "/swagger-ui.html"
+            "/v2/api-docs",
+            "/v3/api-docs/**",
+            "/swagger-resources",
+            "/swagger-resources/**",
+            "/configuration/ui",
+            "/configuration/security",
+            "/swagger-ui/**",
+            "/swagger-ui.html"
     };
 
-    public WebSecurityConfig(UserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
 
-    //    public UserDetailsService userDetailsService() {
-//        UserDetails firstUser = User.withUsername("musa")
-//                .password(passwordEncoder().encode("1234"))
-//                .roles("ADMIN")
-//                .build();
-//
-//        UserDetails secondUser = User.withUsername("ade")
-//                .password(passwordEncoder().encode("12345"))
-//                .roles("USER")
-//                .build();
-//
-//        return new InMemoryUserDetailsManager(firstUser, secondUser);
-//    }
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+        http
+//                .csrf((auth) -> {})
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(authorize->authorize
+//                .authorizeRequests()
+                .requestMatchers(UN_SECURED_URL).permitAll()
+                        .requestMatchers("/api/v1/user/signin").permitAll()
+                        .requestMatchers("api/v1/user/signin").permitAll()
+                .anyRequest().authenticated())
+                .httpBasic(Customizer.withDefaults());
+
+//        http.exceptionHandling((exceptionHandling) ->
+//                exceptionHandling
+//                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+//        );
+//                http.csrf((auth) -> {});
+//        http.formLogin(withDefaults());
+//        http.sessionManagement(session-> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+//        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
@@ -79,34 +87,6 @@ public class WebSecurityConfig {
         return authenticationProvider;
     }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(authorize ->
-                                authorize.requestMatchers(HttpMethod.POST,"/api/v1/user/signup").permitAll()
-                                        .requestMatchers(HttpMethod.POST,"/api/v1/admin/adminsignup").permitAll()
-                                        .requestMatchers(HttpMethod.POST,"/api/v1/user/resetpassword").permitAll()
-                                        .requestMatchers(HttpMethod.POST, "/api/v1/user/signin").permitAll()
-                                        .requestMatchers(HttpMethod.PUT, "/api/v1/user/resetpassword").hasAuthority("USER")
-                                        .requestMatchers(HttpMethod.GET, "/api/v1/user/fetchAll").hasRole("ADMIN")
-//                                        .requestMatchers(HttpMethod.POST, "/api/v1/admin/create-role").hasRole("ADMIN")
-                                        .requestMatchers(HttpMethod.GET, "/api/v1/user/getUser").hasRole("USER")
-                                        .requestMatchers(HttpMethod.POST, "/api/v1/user/event").hasRole("ADMIN")
-                                        .requestMatchers(HttpMethod.POST, "/api/v1/user/event").hasRole("USER")
-                                        .requestMatchers(ADMIN_SECURED_URL).hasRole("ADMIN")
-                                        .requestMatchers(UN_SECURED_URL).permitAll()
-                                        .anyRequest().authenticated()
-//                        hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
-                )
-                .httpBasic(Customizer.withDefaults());
 
-        http.sessionManagement(session-> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        http.authenticationProvider(authenticationProvider());
-//        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
-
-        return http.build();
-    }
 }
+

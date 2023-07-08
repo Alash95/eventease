@@ -1,4 +1,4 @@
-package com.alash.eventease.dto.request;
+package com.alash.eventease.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,5 +12,4 @@ import lombok.NoArgsConstructor;
 public class ChangePasswordDto {
     private String email;
     private String oldPassword;
-    private String newPassword;
-}
+    private String newPassword;}
