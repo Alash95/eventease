@@ -1,8 +1,13 @@
 package com.alash.eventease.service.impl;
 
-import com.alash.eventease.dto.*;
-import com.alash.eventease.model.UserEntity;
-import com.alash.eventease.model.UserRole;
+import com.alash.eventease.dto.request.ChangePasswordDto;
+import com.alash.eventease.dto.request.FetchUserRequest;
+import com.alash.eventease.dto.request.LoginDto;
+import com.alash.eventease.dto.request.UserResponseDto;
+import com.alash.eventease.dto.response.CustomResponse;
+import com.alash.eventease.dto.response.UserRequestDto;
+import com.alash.eventease.model.domain.UserEntity;
+import com.alash.eventease.model.domain.UserRole;
 import com.alash.eventease.repository.UserRepository;
 import com.alash.eventease.repository.UserRoleRepository;
 import com.alash.eventease.service.UserService;

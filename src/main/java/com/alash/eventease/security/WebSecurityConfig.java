@@ -27,6 +27,7 @@ public class WebSecurityConfig {
 
     private static final String[] UN_SECURED_URL = {
             "/api/v1/user/**",
+            "/paystack/**",
             "/v2/api-docs",
             "/v3/api-docs/**",
             "/swagger-resources",

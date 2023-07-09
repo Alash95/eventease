@@ -1,4 +1,4 @@
-package com.alash.eventease.model;
+package com.alash.eventease.model.domain;
 
 
 import jakarta.persistence.*;

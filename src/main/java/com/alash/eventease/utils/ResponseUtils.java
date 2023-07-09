@@ -22,4 +22,10 @@ public class ResponseUtils {
     public static final String UNSUCCESSFUL_LOGIN_RESPONSE_CODE = "008";
     public static final String EMAIL_DOES_NOT_EXIST_MESSAGE = "User does not exist";
     public static final String UNSUCCESSFUL_LOGIN_STATUS = "False";
+    public static final Integer STATUS_CODE_OK = 200;
+    public static final Integer STATUS_CODE_CREATED = 201;
+    public static final String PAYSTACK_INIT = "https://api.paystack.co/plan";
+    public static final String PAYSTACK_INITIALIZE_PAY = "https://api.paystack.co/transaction/initialize";
+    public static final String PAYSTACK_VERIFY = "https://api.paystack.co/transaction/verify/";
+
 }

@@ -1,4 +1,4 @@
-package com.alash.eventease.dto;
+package com.alash.eventease.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

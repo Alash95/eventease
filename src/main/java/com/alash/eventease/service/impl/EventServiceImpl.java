@@ -1,9 +1,9 @@
 package com.alash.eventease.service.impl;
 
-import com.alash.eventease.dto.CreateEventRequest;
-import com.alash.eventease.dto.CustomResponse;
-import com.alash.eventease.model.Event;
-import com.alash.eventease.model.UserEntity;
+import com.alash.eventease.dto.request.CreateEventRequest;
+import com.alash.eventease.dto.response.CustomResponse;
+import com.alash.eventease.model.domain.Event;
+import com.alash.eventease.model.domain.UserEntity;
 import com.alash.eventease.repository.EventRepository;
 import com.alash.eventease.repository.UserRepository;
 import com.alash.eventease.service.EventService;

@@ -1,6 +1,6 @@
 package com.alash.eventease.repository;
 
-import com.alash.eventease.model.UserEntity;
+import com.alash.eventease.model.domain.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

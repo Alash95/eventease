@@ -1,6 +1,10 @@
 package com.alash.eventease.service;
 
-import com.alash.eventease.dto.*;
+import com.alash.eventease.dto.request.ChangePasswordDto;
+import com.alash.eventease.dto.request.FetchUserRequest;
+import com.alash.eventease.dto.request.LoginDto;
+import com.alash.eventease.dto.response.CustomResponse;
+import com.alash.eventease.dto.response.UserRequestDto;
 import org.springframework.http.ResponseEntity;
 
 public interface UserService {

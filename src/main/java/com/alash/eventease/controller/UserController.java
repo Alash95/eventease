@@ -1,6 +1,11 @@
 package com.alash.eventease.controller;
 
-import com.alash.eventease.dto.*;
+import com.alash.eventease.dto.request.ChangePasswordDto;
+import com.alash.eventease.dto.request.CreateEventRequest;
+import com.alash.eventease.dto.request.FetchUserRequest;
+import com.alash.eventease.dto.request.LoginDto;
+import com.alash.eventease.dto.response.CustomResponse;
+import com.alash.eventease.dto.response.UserRequestDto;
 import com.alash.eventease.service.EventService;
 import com.alash.eventease.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;

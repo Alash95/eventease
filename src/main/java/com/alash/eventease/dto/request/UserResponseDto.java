@@ -1,6 +1,6 @@
-package com.alash.eventease.dto;
+package com.alash.eventease.dto.request;
 
-import com.alash.eventease.model.UserRole;
+import com.alash.eventease.model.domain.UserRole;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

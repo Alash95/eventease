@@ -1,6 +1,6 @@
 package com.alash.eventease.security;
 
-import com.alash.eventease.model.UserEntity;
+import com.alash.eventease.model.domain.UserEntity;
 import com.alash.eventease.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
