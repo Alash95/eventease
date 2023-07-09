@@ -6,6 +6,7 @@ import com.alash.eventease.dto.response.CreatePlanResponse;
 import com.alash.eventease.dto.response.InitializePaymentResponse;
 import com.alash.eventease.dto.response.PaymentVerificationResponse;
 import com.alash.eventease.service.PaystackService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
         value = "/paystack",
         produces = MediaType.APPLICATION_JSON_VALUE
 )
+@Tag(name = "paystack")
 public class PaystackController {
 
     private final PaystackService paystackService;

@@ -6,6 +6,7 @@ import com.alash.eventease.dto.request.LoginDto;
 import com.alash.eventease.dto.request.UserResponseDto;
 import com.alash.eventease.dto.response.CustomResponse;
 import com.alash.eventease.dto.response.UserRequestDto;
+import com.alash.eventease.exception.UserAlreadyExistsException;
 import com.alash.eventease.model.domain.UserEntity;
 import com.alash.eventease.model.domain.UserRole;
 import com.alash.eventease.repository.UserRepository;
@@ -13,6 +14,7 @@ import com.alash.eventease.repository.UserRoleRepository;
 import com.alash.eventease.service.UserService;
 import com.alash.eventease.utils.ResponseUtils;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,44 +30,32 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+
     private final UserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-
     private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]+$";
     private static final Pattern pattern = Pattern.compile(EMAIL_REGEX);
+
+    public UserServiceImpl(UserRepository userRepository, UserRoleRepository userRoleRepository,
+                           PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
+        this.userRepository = userRepository;
+        this.userRoleRepository = userRoleRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+    }
+
+
     @Override
     public ResponseEntity<CustomResponse> signup(UserRequestDto request) {
-        boolean existsByEmail = userRepository.existsByEmail(request.getEmail());
+        if(userRepository.existsByEmail(request.getEmail()))  ;
 
-        if(existsByEmail){
-            return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "User already exists"));
-        }
-        if(request == null){
-            return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "Request body is required"));
-        }
-        if(request.getFirstName() == null){
-            return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "firstName is required"));
-        }
-        if(request.getLastName() == null){
-            return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "lastName is required"));
-        }
-        if(request.getEmail() == null){
-            return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "email is required"));
-        }
-        if(!validateEmail(request.getEmail())){
-            return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "provide correct email format"));
-        }
-        if(request.getPhoneNumber() == null){
-            return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "password is required"));
-        }
-        if(request.getPassword() == null){
-            return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "password is required"));
-        }
+
+        ResponseEntity<CustomResponse> BAD_REQUEST = ChecksRequestValidity(request);
+        if (BAD_REQUEST != null) return BAD_REQUEST;
 
         UserRole role = userRoleRepository.findByName("ROLE_USER");
         UserEntity user = UserEntity.builder()
@@ -80,8 +70,37 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         return ResponseEntity.ok().body(new CustomResponse(HttpStatus.CREATED, "User registered successfully"));
-
     }
+
+    private ResponseEntity<CustomResponse> ChecksRequestValidity(UserRequestDto request) {
+
+        if(userRepository.existsByEmail(request.getEmail())){
+            throw new UserAlreadyExistsException("Email already exist");
+        }
+        if(request == null){
+                    return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "Request body is required"));
+                }
+        if(request.getFirstName() == null){
+                    return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "firstName is required"));
+                }
+        if(request.getLastName() == null){
+                    return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "lastName is required"));
+                }
+        if(request.getEmail() == null){
+                    return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "email is required"));
+                }
+        if(!validateEmail(request.getEmail())){
+                    return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "provide correct email format"));
+                }
+        if(request.getPhoneNumber() == null){
+                    return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "password is required"));
+                }
+        if(request.getPassword() == null){
+                    return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "password is required"));
+                }
+        return null;
+            }
+
 
     @Override
     public ResponseEntity<CustomResponse> signIn(LoginDto request) {

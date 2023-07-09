@@ -64,3 +64,12 @@ TWILIO_OUTGOING_SMS_NUMBER: '+13612644939'
 
 server:
   port: 5000
+
+app:
+  jwt-secret: aPC3kbPI5uQggGVJqMPxmivLFFanDhBVXbMWM/dbMik=
+  jwt-expiration:
+    milliseconds: 86400000
+applyforme:
+  paystack:
+    secret:
+      key: sk_test_c799b7ee5687001dfebccddcf4d962323f1fc226
