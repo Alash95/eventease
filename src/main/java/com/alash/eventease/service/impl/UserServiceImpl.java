@@ -1,15 +1,13 @@
 package com.alash.eventease.service.impl;
 
-import com.alash.eventease.dto.request.*;
-import com.alash.eventease.dto.response.CustomResponse;
-import com.alash.eventease.dto.response.Response;
-import com.alash.eventease.model.User;
+import com.alash.eventease.dto.*;
+import com.alash.eventease.model.UserEntity;
 import com.alash.eventease.model.UserRole;
-import com.alash.eventease.repository.RoleRepository;
 import com.alash.eventease.repository.UserRepository;
-import com.alash.eventease.service.EventService;
+import com.alash.eventease.repository.UserRoleRepository;
 import com.alash.eventease.service.UserService;
 import com.alash.eventease.utils.ResponseUtils;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,96 +18,112 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final EventService eventService;
-    private final RoleRepository roleRepository;
-    private final AuthenticationManager authenticationManager;
+    private final UserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
 
-
-    public UserServiceImpl(UserRepository userRepository, EventService eventService, RoleRepository roleRepository, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.eventService = eventService;
-        this.roleRepository = roleRepository;
-        this.authenticationManager = authenticationManager;
-        this.passwordEncoder = passwordEncoder;
-    }
-
+    private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]+$";
+    private static final Pattern pattern = Pattern.compile(EMAIL_REGEX);
     @Override
-    public Response registerUser(RegisterUserRequest request) {
-        boolean isEmailExists = userRepository.existsByEmail(request.getEmail());
+    public ResponseEntity<CustomResponse> signup(UserRequestDto request) {
+        boolean existsByEmail = userRepository.existsByEmail(request.getEmail());
 
-        if (isEmailExists) {
-            return Response.builder()
-                    .responseCode(ResponseUtils.USER_EXISTS_CODE)
-                    .responseMessage(ResponseUtils.USER_EXISTS_MESSAGE)
-                    .data(null)
-                    .build();
+        if(existsByEmail){
+            return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "User already exists"));
+        }
+        if(request == null){
+            return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "Request body is required"));
+        }
+        if(request.getFirstName() == null){
+            return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "firstName is required"));
+        }
+        if(request.getLastName() == null){
+            return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "lastName is required"));
+        }
+        if(request.getEmail() == null){
+            return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "email is required"));
+        }
+        if(!validateEmail(request.getEmail())){
+            return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "provide correct email format"));
+        }
+        if(request.getPhoneNumber() == null){
+            return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "password is required"));
+        }
+        if(request.getPassword() == null){
+            return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "password is required"));
         }
 
-        UserRole role = roleRepository.findByName("ROLE_USER").get();
-        User user = User.builder()
+        UserRole role = userRoleRepository.findByName("ROLE_USER");
+        UserEntity user = UserEntity.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
-                .phoneNumber(request.getPhoneNumber())
                 .email(request.getEmail())
-                .roles((Collections.singleton(role)))
+                .phoneNumber(request.getPhoneNumber())
+                .roles(Collections.singleton(role))
                 .password(passwordEncoder.encode(request.getPassword()))
+                .isEnabled(false)
                 .build();
+        userRepository.save(user);
 
-        User savedUser = userRepository.save(user);
+        return ResponseEntity.ok().body(new CustomResponse(HttpStatus.CREATED, "User registered successfully"));
 
-        return Response.builder()
-                .responseCode(ResponseUtils.SUCCESS)
-                .responseMessage(ResponseUtils.USER_REGISTERED_SUCCESS)
-                .data(Data.builder()
-                        .email(savedUser.getEmail())
-                        .fullName(savedUser.getFirstName() + " " + savedUser.getLastName())
-                        .role(new HashSet<>(user.getRoles()))
-                        .build())
-                .build();
+    }
+
+    @Override
+    public ResponseEntity<CustomResponse> signIn(LoginDto request) {
+////authenticating user here
+//        Authentication authentication = authenticationManager.authenticate(
+//                new UsernamePasswordAuthenticationToken(request.getEmail(),request.getPassword())
+//        );
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+//        AuthResponse authResponse = new AuthResponse();
+//        authResponse.setToken(jwtTokenProvider.generateToken(authentication));
+//        return authResponse;
+Authentication authentication = authenticationManager.authenticate(
+        new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        LoginDto login = new LoginDto();
+                login.setEmail(request.getEmail());
+                login.setPassword(request.getPassword());
+
+        return ResponseEntity.ok().body(new CustomResponse(HttpStatus.OK, ResponseUtils.SUCCESSFUL_LOGIN_MESSAGE));
+
     }
 
 
-
-    @Override
-    public ResponseEntity<Response> signIn(LoginDto request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(),request.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        return new  ResponseEntity<>(
-                Response.builder()
-                        .responseCode(ResponseUtils.SUCCESSFUL_LOGIN_RESPONSE_CODE)
-                        .responseMessage(ResponseUtils.SUCCESSFUL_LOGIN_MESSAGE)
-                        .data(null)
-                        .build(), HttpStatus.CREATED);    }
 
     @Override
     public ResponseEntity<CustomResponse> changePassword(ChangePasswordDto request) {
         if(request.getEmail() == null){
             return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "email is required"));
         }
-//        if(!validateEmail(request.getEmail())){
-//            return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "provide correct email format"));
-//        }
+        if(!validateEmail(request.getEmail())){
+            return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "provide correct email format"));
+        }
         if(request.getOldPassword() == null){
             return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "oldPassword is required"));
         }
         if(request.getNewPassword() == null){
             return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "newPassword is required"));
         }
-        Optional<User> userOpt = userRepository.findUserByEmail(request.getEmail());
+        Optional<UserEntity> userOpt = userRepository.findByEmail(request.getEmail());
 
         if(userOpt.isEmpty()){
             return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "No user is associated with this email"));
         }
 
-        User user = userOpt.get();
+        UserEntity user = userOpt.get();
         if(!passwordEncoder.matches(request.getOldPassword(), user.getPassword())){
             return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "Old password is not correct. Try again"));
         }
@@ -117,79 +131,58 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
 
-        return ResponseEntity.ok(new CustomResponse(HttpStatus.OK, "Password has been successfully changed"));
+        return ResponseEntity.ok(new CustomResponse(HttpStatus.OK, ResponseUtils.SUCCESSFULLY_RESET_PASSWORD_MESSAGE));
     }
 
 
+
     @Override
-    public Response addEvent(CreateEventRequest request) {
-        User foundUser = userRepository.findUserByEmail(request.getEmail()).get();
-        if (!userRepository.existsByEmail(request.getEmail())){
-            return Response.builder()
-                    .responseCode(ResponseUtils.USER_NOT_FOUND_CODE)
-                    .responseMessage(ResponseUtils.USER_NOT_FOUND)
-                    .data(null)
-                    .build();
+    public ResponseEntity<CustomResponse> fetchAllUsers() {
+        List<UserEntity> users = userRepository.findAll();
+        List<UserResponseDto> userResponseList = users.stream()
+                .map(user -> mapToUserResponse(user)).collect(Collectors.toList());
+
+        CustomResponse successResponse = CustomResponse.builder()
+                .status(HttpStatus.OK.name())
+                .message("Successful")
+                .data(userResponseList.isEmpty() ? null : userResponseList)
+                .build();
+
+        return ResponseEntity.ok(successResponse);
+    }
+
+    @Override
+    public ResponseEntity<CustomResponse> fetchSingleUser(FetchUserRequest request) {
+        Optional<UserEntity> userOpt = userRepository.findByEmail(request.getEmail());
+        if(userOpt.isEmpty()){
+            return ResponseEntity.badRequest().body(new CustomResponse(HttpStatus.BAD_REQUEST, "No user with email address found"));
         }
-        EventDto event = new EventDto();
-        event.setEmail(request.getEmail());
-        event.setEventName(request.getEventName());
-        event.setLocation(request.getEventLocation());
-        event.setDescription(request.getDescription());
+        UserEntity user = userOpt.get();
+        UserResponseDto response = UserResponseDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .phoneNumber(user.getPhoneNumber())
+                .role(new HashSet<>(user.getRoles()))
+                .isEnabled(user.isEnabled())
+                .build();
+        return ResponseEntity.ok(new CustomResponse(HttpStatus.OK.name(), response, "Successful"));    }
 
-        eventService.saveEvent(event);
+    public static boolean validateEmail(String email) {
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
+    }
 
-
-        return Response.builder()
-                .responseCode(ResponseUtils.SUCCESS)
-                .responseMessage(ResponseUtils.SUCCESS_MESSAGE)
-                .data(Data.builder()
-                        .email(foundUser.getEmail())
-                        .eventName(request.getEventName())
-                        .eventLocation(request.getEventLocation())
-                        .build())
+    private UserResponseDto mapToUserResponse(UserEntity user) {
+        return UserResponseDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .lastName(user.getLastName())
+                .firstName(user.getFirstName())
+                .phoneNumber(user.getPhoneNumber())
+                .role(new HashSet<>(user.getRoles()))
+                .isEnabled(user.isEnabled())
                 .build();
     }
-
-    @Override
-    public List<Response> fetchAllUsers() {
-        List<User> userList =userRepository.findAll();
-
-        List<Response> response = new ArrayList<>();
-        for (User user: userList) {
-            response.add(Response.builder()
-                            .responseCode(ResponseUtils.SUCCESS)
-                            .responseMessage(ResponseUtils.SUCCESS_MESSAGE)
-                            .data(Data.builder()
-                                    .fullName(user.getFirstName() + " " + user.getLastName())
-                                    .email(user.getEmail())
-                                    .role(new HashSet<>(user.getRoles()))
-                                    .build())
-                    .build());
-        }
-        return response;
-    }
-
-    @Override
-    public Response fetchSingleUser(String email) {
-        if (!userRepository.existsByEmail(email)) {
-            return Response.builder()
-                    .responseCode(ResponseUtils.USER_NOT_FOUND_CODE)
-                    .responseMessage(ResponseUtils.USER_NOT_FOUND)
-                    .data(null)
-                    .build();
-        }
-        User user = userRepository.findUserByEmail(email).get();
-
-        return Response.builder()
-                .responseCode(ResponseUtils.SUCCESS)
-                .responseMessage(ResponseUtils.SUCCESS_MESSAGE)
-                .data(Data.builder()
-                        .fullName(user.getFirstName() + " " + user.getLastName())
-                        .email(user.getEmail())
-                        .build())
-                .build();
-    }
-
-
 }
