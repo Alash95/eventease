@@ -27,6 +27,7 @@ public class WebSecurityConfig {
 
     private static final String[] UN_SECURED_URL = {
             "/api/v1/user/**",
+            "/api/v1/user/signin",
             "/paystack/**",
             "/api/**",
             "/v2/api-docs",
@@ -46,8 +47,6 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize->authorize
                 .requestMatchers(UN_SECURED_URL).permitAll()
-                .requestMatchers("/api/v1/user/signin").permitAll()
-                .requestMatchers("api/v1/user/signin").permitAll()
                 .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults());
 

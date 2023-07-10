@@ -5,6 +5,7 @@ import com.alash.eventease.dto.request.InitializePaymentDto;
 import com.alash.eventease.dto.response.CreatePlanResponse;
 import com.alash.eventease.dto.response.InitializePaymentResponse;
 import com.alash.eventease.dto.response.PaymentVerificationResponse;
+import org.springframework.stereotype.Service;
 
 public interface PaystackService {
     CreatePlanResponse createPlan(CreatePlanDto createPlanDto) throws Exception;
