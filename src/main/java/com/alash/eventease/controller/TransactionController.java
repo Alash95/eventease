@@ -1,6 +1,6 @@
 package com.alash.eventease.controller;
 
-import com.alash.eventease.model.domain.TransactionDetail;
+import com.alash.eventease.dto.request.TransactionDetailsDto;
 import com.google.gson.Gson;
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
@@ -24,14 +24,16 @@ import java.util.Map;
 public class TransactionController {
 
     @PostMapping(value = "/generateQRCode", produces = MediaType.IMAGE_PNG_VALUE)
-    public @ResponseBody byte[] generateQRCode(@RequestBody TransactionDetail transactionDetails) throws Exception {
+    public @ResponseBody byte[] generateQRCode(@RequestBody TransactionDetailsDto transactionDetails) throws Exception {
         String transactionData = encodeTransactionDetails(transactionDetails);
         return generateQRCodeImage(transactionData);
     }
 
-    private String encodeTransactionDetails(TransactionDetail transactionDetails) {
+    private String encodeTransactionDetails(TransactionDetailsDto transactionDetails) {
         Gson gson = new Gson();
-        return gson.toJson(transactionDetails);
+        String json = gson.toJson(transactionDetails);
+        TransactionDetailsDto tt = gson.fromJson(json, TransactionDetailsDto.class);
+        return gson.toJson(tt);
     }
 
     private byte[] generateQRCodeImage(String data) throws Exception {

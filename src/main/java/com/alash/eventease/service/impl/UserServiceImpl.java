@@ -164,7 +164,7 @@ Authentication authentication = authenticationManager.authenticate(
     public ResponseEntity<CustomResponse> fetchAllUsers() {
         List<UserEntity> users = userRepository.findAll();
         List<UserResponseDto> userResponseList = users.stream()
-                .map(user -> mapToUserResponse(user)).collect(Collectors.toList());
+                .map(this::mapToUserResponse).collect(Collectors.toList());
 
         CustomResponse successResponse = CustomResponse.builder()
                 .status(HttpStatus.OK.name())

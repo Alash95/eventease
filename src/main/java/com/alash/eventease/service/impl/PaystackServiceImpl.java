@@ -35,7 +35,7 @@ public class PaystackServiceImpl implements PaystackService {
     private final PaystackPaymentRepositoryImpl paystackPaymentRepository;
     private final AppUserRepositoryImpl appUserRepository;
 
-    @Value("${applyforme.paystack.secret.key}")
+    @Value("${applyforme.paystack.public.key}")
     private String paystackSecretKey;
 
     public PaystackServiceImpl(PaystackPaymentRepositoryImpl paystackPaymentRepository, AppUserRepositoryImpl appUserRepository) {

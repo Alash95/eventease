@@ -78,7 +78,8 @@ app:
     milliseconds: 86400000
 applyforme:
   paystack:
-    secret:
-      key: sk_test_c799b7ee5687001dfebccddcf4d962323f1fc226
+    public:
+       key: pk_test_d3a0bd4d11150fe66056f39802c2cc55d7459cad
+
 
 
