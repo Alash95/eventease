@@ -1,4 +1,4 @@
-package com.alash.eventease.dto.request;
+package com.alash.eventease.dto.response;
 
 import com.alash.eventease.model.domain.UserRole;
 import com.fasterxml.jackson.annotation.JsonInclude;

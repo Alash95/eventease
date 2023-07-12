@@ -7,5 +7,6 @@ import org.springframework.http.ResponseEntity;
 public interface EventService {
 //    void saveEvent(CreateEventRequest event);
     ResponseEntity<CustomResponse> addEvent(CreateEventRequest request);
+    ResponseEntity<CustomResponse> fetchAllEvents();
 
 }

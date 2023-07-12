@@ -1,5 +1,6 @@
-package com.alash.eventease.dto.request;
+package com.alash.eventease.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,19 +9,17 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-@Data
 @Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateEventRequest {
-    private String email;
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class EventResponseDto {
+    private Long id;
     private String eventName;
-    private String eventLocation;
     private String description;
-    @CreationTimestamp
     private LocalDate startDate;
-    @UpdateTimestamp
     private LocalDate endDate;
+    private String location;
+    private Integer price;
 }

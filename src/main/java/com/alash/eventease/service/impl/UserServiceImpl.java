@@ -1,11 +1,9 @@
 package com.alash.eventease.service.impl;
 
-import com.alash.eventease.dto.request.ChangePasswordDto;
-import com.alash.eventease.dto.request.FetchUserRequest;
-import com.alash.eventease.dto.request.LoginDto;
-import com.alash.eventease.dto.request.UserResponseDto;
+import com.alash.eventease.dto.request.*;
 import com.alash.eventease.dto.response.CustomResponse;
 import com.alash.eventease.dto.response.UserRequestDto;
+import com.alash.eventease.dto.response.UserResponseDto;
 import com.alash.eventease.exception.UserAlreadyExistsException;
 import com.alash.eventease.model.domain.UserEntity;
 import com.alash.eventease.model.domain.UserRole;
@@ -13,8 +11,7 @@ import com.alash.eventease.repository.UserRepository;
 import com.alash.eventease.repository.UserRoleRepository;
 import com.alash.eventease.service.UserService;
 import com.alash.eventease.utils.ResponseUtils;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.mail.MessagingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,7 +20,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,9 +51,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<CustomResponse> signup(UserRequestDto request) {
-        if(userRepository.existsByEmail(request.getEmail()))  ;
-
-
         ResponseEntity<CustomResponse> BAD_REQUEST = ChecksRequestValidity(request);
         if (BAD_REQUEST != null) return BAD_REQUEST;
 
@@ -104,15 +101,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<CustomResponse> signIn(LoginDto request) {
-////authenticating user here
-//        Authentication authentication = authenticationManager.authenticate(
-//                new UsernamePasswordAuthenticationToken(request.getEmail(),request.getPassword())
-//        );
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
-//        AuthResponse authResponse = new AuthResponse();
-//        authResponse.setToken(jwtTokenProvider.generateToken(authentication));
-//        return authResponse;
-Authentication authentication = authenticationManager.authenticate(
+        Authentication authentication = authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -192,6 +181,58 @@ Authentication authentication = authenticationManager.authenticate(
                 .isEnabled(user.isEnabled())
                 .build();
         return ResponseEntity.ok(new CustomResponse(HttpStatus.OK.name(), response, "Successful"));    }
+
+    @Override
+    public ResponseEntity<CustomResponse> verifyEmail(String token) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<?> resendVerificationTokenEmail(String oldToken) throws MessagingException, UnsupportedEncodingException {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<CustomResponse> addAddress(Long userId, UserAddressRequest request) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<CustomResponse> deleteProfile(Long userId) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<CustomResponse> updateProfile(Long userId, UserRequestDto request) {
+        return null;
+    }
+
+
+
+    @Override
+    public ResponseEntity<CustomResponse> uploadProfilePicture(Long userId, MultipartFile file) throws IOException {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<CustomResponse> fetchProfilePicture(Long userId) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<CustomResponse> resetPassword(String email) throws MessagingException, UnsupportedEncodingException {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<CustomResponse> confirmResetPassword(Integer token, ResetPasswordDto request) {
+        return null;
+    }
+
+    @Override
+    public void saveVerificationToken(UserEntity theUser, String verificationToken) {
+
+    }
 
     public static boolean validateEmail(String email) {
         Matcher matcher = pattern.matcher(email);

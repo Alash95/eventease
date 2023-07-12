@@ -8,6 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -27,4 +28,7 @@ public class Event {
     @UpdateTimestamp
     private LocalDate endDate;
     private String location;
+    private Integer price;
+    @OneToMany(mappedBy = "event")
+    private List<Booking> bookings;
 }
