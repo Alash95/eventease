@@ -76,10 +76,9 @@ app:
   jwt-secret: aPC3kbPI5uQggGVJqMPxmivLFFanDhBVXbMWM/dbMik=
   jwt-expiration:
     milliseconds: 86400000
-applyforme:
-  paystack:
-    public:
-       key: pk_test_d3a0bd4d11150fe66056f39802c2cc55d7459cad
+paystack:
+  secret-key: sk_test_03487c78f5c63bb483e06bbfc634b8f2eab2b665
+  base-url: https://api.paystack.co/
 
 
 

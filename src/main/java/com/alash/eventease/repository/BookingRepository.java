@@ -8,12 +8,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
+
+
+    Optional<Booking> findByReference(String orderReference);
     List<Booking> findByUser(UserEntity user);
     List<Booking> findByEvent(Event event);
-    List<Booking> findByBookingDateBetween(LocalDate startDate, LocalDate endDate);
+    List<Booking> findByBookingDateBetween(String startDate, String endDate);
 
     // Example: Find all bookings for a specific user
     List<Booking> findAllByUser(UserEntity user);

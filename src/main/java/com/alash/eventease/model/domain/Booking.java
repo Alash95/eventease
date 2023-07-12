@@ -17,11 +17,12 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    private String status;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity user;
-
+    private double totalAmount;
+    private String reference;
     @ManyToOne
     @JoinColumn(name = "event_id")
     private Event event;
