@@ -77,7 +77,7 @@ app:
   jwt-expiration:
     milliseconds: 86400000
 paystack:
-  secret-key: sk_test_03487c78f5c63bb483e06bbfc634b8f2eab2b665
+  secret-key: sk_test_410d86b9daa95a19170dd32e52fde759fd472932
   base-url: https://api.paystack.co/
 
 

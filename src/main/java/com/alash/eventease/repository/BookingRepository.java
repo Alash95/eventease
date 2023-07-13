@@ -15,7 +15,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
 
     Optional<Booking> findByReference(String orderReference);
-    List<Booking> findByUser(UserEntity user);
+    List<Booking> findByUserId(Long userId);
     List<Booking> findByEvent(Event event);
     List<Booking> findByBookingDateBetween(String startDate, String endDate);
 

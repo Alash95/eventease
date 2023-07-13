@@ -4,8 +4,11 @@ import com.alash.eventease.dto.request.CreateEventRequest;
 import com.alash.eventease.dto.response.EventResponseDto;
 import com.alash.eventease.dto.response.UserResponseDto;
 import com.alash.eventease.dto.response.CustomResponse;
+import com.alash.eventease.exception.UserNotFoundException;
+import com.alash.eventease.model.domain.Booking;
 import com.alash.eventease.model.domain.Event;
 import com.alash.eventease.model.domain.UserEntity;
+import com.alash.eventease.repository.BookingRepository;
 import com.alash.eventease.repository.EventRepository;
 import com.alash.eventease.repository.UserRepository;
 import com.alash.eventease.service.EventService;
@@ -15,16 +18,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
+import java.awt.print.Book;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+
 public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
 
 
     @Override
@@ -43,8 +48,10 @@ public class EventServiceImpl implements EventService {
                 .build();
         eventRepository.save(event);
 
+        CustomResponse customResponse = new CustomResponse(HttpStatus.OK, "Event created successfully");
+        customResponse.setData(event);
+        return ResponseEntity.ok().body(customResponse);
 
-        return ResponseEntity.ok().body(new CustomResponse(HttpStatus.CREATED, "Event created successfully"));
     }
 
     @Override
@@ -59,8 +66,50 @@ public class EventServiceImpl implements EventService {
                 .data(eventResponseList.isEmpty() ? null : eventResponseList)
                 .build();
 
-        return ResponseEntity.ok(successResponse);
+        CustomResponse customResponse = new CustomResponse(HttpStatus.OK, "Successful");
+        customResponse.setData(successResponse);
+        return ResponseEntity.ok().body(customResponse);
+
     }
+
+    @Override
+    public ResponseEntity<CustomResponse> getRegisteredEvents(Long userId) {
+        Optional<UserEntity> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            // Handle the case when the user does not exist
+            return ResponseEntity
+                    .badRequest()
+                    .body(new CustomResponse(HttpStatus.BAD_REQUEST, "No user found"));
+        }
+
+        // Retrieve the event registrations for the user
+        List<Booking> bookings = bookingRepository.findByUserId(userId);
+
+        // Retrieve the event details for each registration
+        List<Event> registeredEvents = new ArrayList<>();
+        for (Booking registration : bookings) {
+            Optional<Event> event = eventRepository.findById(registration.getId());
+            if (event.isPresent()) {
+                registeredEvents.add(event.get());
+            }
+        }
+
+        if (registeredEvents.isEmpty()) {
+            // Handle the case when the user has no registered events
+            return ResponseEntity
+                    .ok()
+                    .body(new CustomResponse(HttpStatus.NOT_FOUND, "No registered events found"));
+        }
+
+        CustomResponse customResponse = new CustomResponse(HttpStatus.OK, "Registered events found");
+        customResponse.setData(registeredEvents);
+
+        return ResponseEntity.ok().body(customResponse);
+    }
+
+
+
+
 
     private EventResponseDto mapToUserResponse(Event event) {
         return EventResponseDto.builder()

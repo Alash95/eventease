@@ -31,4 +31,6 @@ public class Event {
     private Integer price;
     @OneToMany(mappedBy = "event")
     private List<Booking> bookings;
+    @ManyToMany(mappedBy = "registeredEvents")
+    private List<UserEntity> registeredUsers;
 }

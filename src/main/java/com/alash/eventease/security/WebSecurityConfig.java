@@ -28,6 +28,7 @@ public class WebSecurityConfig {
     private static final String[] UN_SECURED_URL = {
             "/api/v1/user/**",
             "/api/v1/user/signin",
+            "/api/v1/auth/**",
             "/paystack/**",
             "/api/**",
             "/v2/api-docs",
@@ -40,6 +41,17 @@ public class WebSecurityConfig {
             "/swagger-ui.html"
     };
 
+    private static final String[] ADMIN_SECURED_URL = {
+            "/api/v1/admin/**"
+
+
+    };
+
+    private static final String[] CUSTOMER_SECURED_URL = {
+            "/api/v1/auth/user/**",
+
+    };
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
@@ -48,7 +60,9 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize->authorize
                 .requestMatchers(UN_SECURED_URL).permitAll()
-                .anyRequest().authenticated())
+                .requestMatchers(ADMIN_SECURED_URL).hasAuthority("ADMIN")
+                .requestMatchers(CUSTOMER_SECURED_URL).hasAuthority("USER")
+                .anyRequest().hasAnyAuthority("ROLE_ADMIN", "ROLE_USER"))
                 .httpBasic(Customizer.withDefaults());
 
                 http.sessionManagement(session-> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

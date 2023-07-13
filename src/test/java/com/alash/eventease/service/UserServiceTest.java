@@ -5,14 +5,20 @@ import com.alash.eventease.dto.response.UserRequestDto;
 import com.alash.eventease.exception.UserAlreadyExistsException;
 import com.alash.eventease.model.domain.UserEntity;
 import com.alash.eventease.model.domain.UserRole;
+import com.alash.eventease.repository.IVerificationTokenRepository;
 import com.alash.eventease.repository.UserRepository;
 import com.alash.eventease.repository.UserRoleRepository;
+import com.alash.eventease.service.impl.EmailService;
 import com.alash.eventease.service.impl.UserServiceImpl;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,18 +37,30 @@ class UserServiceTest {
     @Mock
     private UserRoleRepository userRoleRepository;
     @Mock
+    private IVerificationTokenRepository tokenRepository;
+    @Mock
+    private EmailService emailService;
+    @Mock
+    private RedisTemplate redisTemplate;
+    @Mock
+    private HttpServletRequest servletRequest;
+    @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
     private AuthenticationManager authenticationManager;
     @Captor
     private ArgumentCaptor<UserEntity> userArgumentCaptor;
+    @Mock
     private UserService userService;
+    @Mock
+    private ApplicationEventPublisher publisher;
 
     @BeforeEach
     void setUp() {
         userService = new UserServiceImpl(
                 userRepository, userRoleRepository,
-                passwordEncoder, authenticationManager);
+                tokenRepository, emailService, publisher,
+                redisTemplate, passwordEncoder, authenticationManager, servletRequest);
     }
 
     @Test

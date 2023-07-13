@@ -21,7 +21,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api")
 @Tag(name = "transactionQRCode")
-public class TransactionController {
+public class TransactionDetailsController {
 
     @PostMapping(value = "/generateQRCode", produces = MediaType.IMAGE_PNG_VALUE)
     public @ResponseBody byte[] generateQRCode(@RequestBody TransactionDetailsDto transactionDetails) throws Exception {
